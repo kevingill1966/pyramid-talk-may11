@@ -1,0 +1,9 @@
+<h1>Hello world!</h1>
+
+<p>Chameleon Template</p>
+
+File: <span tal:replace="file" /><br/>
+Package: <span tal:replace="package" /><br/>
+
+File: ${file}<br/>
+Package: ${package}<br/>
