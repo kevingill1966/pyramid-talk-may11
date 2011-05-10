@@ -510,6 +510,53 @@ and see values from the database::
           ${root.value}
           ${root}
 
-*Using Alchemy Forms*
+*Using pyramid_formalchemy*
 
+pyramid_formalchemy gives a simple crud user interfaces for viewing / editing
+data in the models.
+
+See: http://docs.formalchemy.org/pyramid_formalchemy/
+
+::
+
+    $ pip install pyramid_formalchemy
+    $ pip install fa.jquery
+
+Place the following code into proj_011_alchemy/proj_011_alchemy/forms.py::
+
+    from formalchemy import FieldSet, Grid
+
+Change the registration proj_011_alchemy/proj_011_alchemy/__init__.py::
+
+    def main(global_config, **settings):
+        """ This function returns a Pyramid WSGI application.
+        """
+        engine = engine_from_config(settings, 'sqlalchemy.')
+        initialize_sql(engine)
+        config = Configurator(settings=settings)
+        config.add_static_view('static', 'proj_011_alchemy:static')
+        config.add_route('home', '/', view='proj_011_alchemy.views.my_view',
+                         view_renderer='templates/mytemplate.pt')
+
+        # pyramid_formalchemy's configuration
+        config.include('pyramid_formalchemy')
+        config.include('fa.jquery')
+
+        # register an admin UI
+        config.formalchemy_admin('/admin', package='proj_011_alchemy',
+            view='fa.jquery.pyramid.ModelView')
+
+        return config.make_wsgi_app()
+
+Change the constructor of MyModel so that the parameters are optional::
+
+    class MyModel(Base):
+        __tablename__ = 'models'
+        id = Column(Integer, primary_key=True)
+        name = Column(Unicode(255), unique=True)
+        value = Column(Integer)
+            
+        def __init__(self, name='', value=None):
+            self.name = name
+            self.value = value
 
