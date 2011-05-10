@@ -330,6 +330,55 @@ This code provides these URLs:
         app = config.make_wsgi_app()
         serve(app, host='0.0.0.0')
 
+Using deform (020_deform.py)
+----------------------------
+
+Forms are not part of Pyramid. They are considered a 'library' issue
+rather than a 'framework' issue.
+
+The approach is to use different components for the form. I used:
+
+    - deform - generates forms from a schema
+    - colander - extract fields from the request
+
+Advantages of this approach:
+
+    - form templating is independent of templating system, i.e. inserts form intto jinja2, chameleon or mako
+    - request parsing is more reusable
+
+::
+
+    from paste.httpserver import serve
+    from pyramid.config import Configurator
+    from pyramid.response import Response
+
+    import deform
+    import colander
+
+    class Schema(colander.MappingSchema):
+        firstname = colander.SchemaNode(colander.String(), title=u'First Name')
+        lastname = colander.SchemaNode(colander.String(), title=u'Last Name')
+
+
+    def hello_world(request):
+        form = deform.Form(Schema(), buttons=(
+            deform.Button('submit', 'Say Hello'),))
+
+        if 'submit' in request.POST:
+            try:
+                appstruct = form.validate(request.params.items())
+                return Response('Hello <b>%s %s</b> from %s (%s)!' % (
+                    request.params['firstname'], request.params['lastname'], __file__, __package__))
+            except deform.ValidationFailure, e:
+                return Response(e.render())
+        else:
+            return Response(form.render())
+
+    if __name__ == '__main__':
+        config = Configurator()
+        config.add_view(hello_world)
+        app = config.make_wsgi_app()
+        serve(app, host='0.0.0.0')
 
 Using Projects
 --------------
@@ -395,9 +444,9 @@ Initialise the project::
     $ cd proj_010_jinja_project
     $ python setup.py develop
 
-Run the project::
+Run the project (--reload parameter optional - useful in development)::
 
-    $ paster serve development.ini 
+    $ paster serve development.ini --reload
     Starting server in PID 485.
     serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
 
@@ -418,4 +467,49 @@ Modify the file to include the following errors.::
     {{ badvar/1 }}
 
 The redisplay the page to navigate through the call stack.
+
+
+* Testing *
+
+Usual unit test stuff::
+
+    python setup.py test
+
+Using SQLAlchemy
+----------------
+
+Create a new project::
+
+    $ paster create -t pyramid_routesalchemy  proj_011_alchemySelected and implied templates:
+      pyramid#pyramid_routesalchemy  pyramid SQLAlchemy project using url dispatch (no traversal)
+
+    ...
+
+Build the project::
+
+    $ cd proj_011_alchemy
+    $ python setup.py develop
+
+Connection information is in the .ini file::
+
+    [app:proj_011_alchemy]
+    use = egg:proj_011_alchemy
+    ...
+    sqlalchemy.url = sqlite:///%(here)s/proj_011_alchemy.db
+
+The database is initialised in *proj_011_alchemy/models.py:initialize_sql* .
+
+If you load the root URL, the view */proj_011_alchemy/views.py:my_view* .
+
+You can include these values into the template 
+*/proj_011_alchemy/templates/mytemplate.pt* 
+and see values from the database::
+
+          ${root.name}
+          ${root.id}
+          ${root.value}
+          ${root}
+
+*Using Alchemy Forms*
+
 
