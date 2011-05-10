@@ -517,6 +517,12 @@ data in the models.
 
 See: http://docs.formalchemy.org/pyramid_formalchemy/
 
+Creates URL:
+
+    http://localhost:6543/admin
+
+    
+
 ::
 
     $ pip install pyramid_formalchemy
