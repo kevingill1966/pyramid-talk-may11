@@ -21,7 +21,7 @@ http://docs.pylonsproject.org/projects/pyramid/1.0/narr/install.html#installing-
 
 Checkout the repository from git::
 
-    $ git clone git@github.com:kevingill1966/pyramid-talk-may11.git pyramid-talk-may11.git
+    $ git clone git@github.com:kevingill1966/pyramid-talk-may11.git pyramid-talk-may11
 
 Quick Start (001_quickstart.py)
 -------------------------------
